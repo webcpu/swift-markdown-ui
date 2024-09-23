@@ -157,7 +157,7 @@ private struct AttributedStringInlineRenderer {
   }
 }
 extension String {
-        private func encodedMessageURL() -> String? {
+        func encodedMessageURL() -> String? {
         // Extract the URL path between angle brackets
         let pathStartIndex = self.index(self.startIndex, offsetBy: "message://".count)
         let path = String(self[pathStartIndex...])
