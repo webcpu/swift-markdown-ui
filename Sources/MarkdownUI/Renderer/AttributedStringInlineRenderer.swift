@@ -142,7 +142,8 @@ private struct AttributedStringInlineRenderer {
   private mutating func renderLink(destination: String, children: [InlineNode]) {
     let savedAttributes = self.attributes
     self.attributes = self.textStyles.link.mergingAttributes(self.attributes)
-    self.attributes.link = URL(string: destination, relativeTo: self.baseURL)
+    let urlString = destination.encodedMessageURL() ?? destination
+    self.attributes.link = URL(string: urlString, relativeTo: self.baseURL)
 
     for child in children {
       self.render(child)
@@ -154,6 +155,21 @@ private struct AttributedStringInlineRenderer {
   private mutating func renderImage(source: String, children: [InlineNode]) {
     // AttributedString does not support images
   }
+}
+extension String {
+        private func encodedMessageURL() -> String? {
+        // Extract the URL path between angle brackets
+        let pathStartIndex = self.index(self.startIndex, offsetBy: "message://".count)
+        let path = String(self[pathStartIndex...])
+        
+        // Percent-encode the path
+        guard let encodedPath = path.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) else {
+            return nil
+        }
+        
+        // Reconstruct the encoded URL
+        return "message://\(encodedPath)"
+    }
 }
 
 extension TextStyle {
